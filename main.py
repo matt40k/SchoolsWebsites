@@ -11,10 +11,11 @@ import tweepy
 import ConfigParser
 
 # Define variables
-dbName     = 'school.db'					# Defined the database filename
+dbName     = 'school.db'									# Defined the database filename
 edubaseUrl = 'https://getedubaseurl.apphb.com/api/Product/'	# Url to the latest Edubase data extract URL
 configFile = 'config.txt'
 
+# Get timestamp
 def now () :
 	return datetime.datetime.now()
 
@@ -107,15 +108,18 @@ def GetIPv6Result ( domain ) :
 	#       print respJson[key]["name"] + " - " + respJson[key]["result"]
 	return score
 
+# Print a line to the console.
 def PrintLine ( ) :
 	print ("======================================")
 
+# Post a Tweet to Twitter.
 def Tweet ( tweetMessage ) :
 	auth = tweepy.OAuthHandler(GetFileConfig('Twitter', consumer_key), GetFileConfig('Twitter', consumer_secret))
 	auth.set_access_token(GetFileConfig('Twitter', access_token), GetFileConfig('Twitter', access_token_secret))
 	api = tweepy.API(auth)
 	api.update_status(status=tweetMessage)
 
+# Import the Edubase csv file into the database.
 def ImportEdubaseDump ( eduBaseFileName ) :
 	rowNo = 0
 	with open(eduBaseFileName) as csvfile :
@@ -140,35 +144,39 @@ def ImportEdubaseDump ( eduBaseFileName ) :
 				InsertSchool(Urn, LaCode, LaName, EstablishmentCode, EstablishmentName, TypeOfEstablishment, SchoolWebsite, HeadJobTitle, HeadName, now() )
 
                		rowNo += 1
-
+################
 # Configuration
+################
+# Read config from database
 def GetConfig(ConfigItem) : 
 	configSql = ("SELECT Value FROM config where Name = '" + ConfigItem + "'")
 	configVal = execSql(configSql)
 	return configVal
-
+# Set config to database
 def SetConfig(ConfigItem, ConfigType) :
 	configSql = ("INSERT or REPLACE INTO config (Name, Value) VALUES ('" + ConfigItem + "', '" + ConfigValue + "'")
 	execSql(configSql)
-
+# Read config from file
 def GetFileConfig (ConfigSection, ConfigItem) :
 	cfg = ConfigParser.RawConfigParser()
 	cfg.read(configFile)
 	ConfigValue = cfg.get(ConfigSection, ConfigItem)
-	#print ConfigValue	
 	return ConfigValue
-	
+# Set config to database	
 def SetFileConfig (ConfigSection, ConfigItem, ConfigValue) :
 	cfg = ConfigParser.RawConfigParser()
 	cfg.add_section(ConfigSection)
 	config.set(ConfigSection, ConfigItem, ConfigValue)
-
 	with open(configFile, 'wb') as configfile :
 		cfg.write(configfile)
 
+# Delete database and remove any csv files.
 def ClearDown () :
 	delOldDumps()
-	os.remove('school.db')	
+	if ( os.path.isfile(dbName) ) :
+		os.remove(dbName)	
+
+######################
 
 print ("Start  = %s" % now() ) 
 PrintLine()
