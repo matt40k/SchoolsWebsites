@@ -1,0 +1,15 @@
+# Git ignore
+###############
+
+# Config file
+config.txt
+
+# Temp folders
+archive/
+wip/
+
+# Ignore any Edubase csv files
+*.csv
+
+# Ignore the school.db
+school.db
