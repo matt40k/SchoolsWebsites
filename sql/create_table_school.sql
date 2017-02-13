@@ -10,5 +10,5 @@ CREATE TABLE IF NOT EXISTS school
 	,Domain text
 	,HeadName text
 	,HeadJobTitle text
-	,ModifiedDateTime text
-)
+	,ModifiedDateTime TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
