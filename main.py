@@ -11,7 +11,7 @@ import tweepy
 import ConfigParser
 
 # Define variables
-dbName     = 'school.db'									# Defined the database filename
+dbName	   = 'school.db'									# Defined the database filename
 edubaseUrl = 'https://getedubaseurl.apphb.com/api/Product/'	# Url to the latest Edubase data extract URL
 configFile = 'config.txt'
 
@@ -35,7 +35,7 @@ def execSql ( cmd ) :
 	return result
 
 # Delete old Edubase extracts
-def delOldDumps( ):
+def delOldDumps ( ) :
         filelist = [ f for f in os.listdir(".") if f.endswith(".csv") ]
         for f in filelist:
                 os.remove(f)
@@ -46,7 +46,6 @@ def GetLatestEdubaseDump ( ) :
 	response = urlopen(edubaseUrl)
 	dumpUrl = json.loads(response.read())[0]["AllDownloadUrl"]
 	dumpName = urlparse.urlsplit(dumpUrl).path.split('/')[-1]
-
 	if (not os.path.isfile(dumpName)):
 	        delOldDumps()
 	        print ("Downloading Edubase data...")
@@ -68,29 +67,36 @@ def CreateDatabase ( ) :
 
 # Insert record into Schools
 def InsertSchool ( Urn, LaCode, LaName, EstablishmentCode, EstablishmentName, TypeOfEstablishment, SchoolWebsite, HeadJobTitle, HeadName ,ModifiedDateTime ) :
-	LaName = LaName.replace("'", "''")
-	EstablishmentName = EstablishmentName.replace("'", "''")
-	TypeOfEstablishment = TypeOfEstablishment.replace("'", "''")
-	SchoolWebsite = SchoolWebsite.replace("'", "''")
-	HeadJobTitle = HeadJobTitle.replace("'", "''")
-	HeadName = HeadName.replace("'", "''")	
-	ModifiedDateTime = str(ModifiedDateTime).replace("'", "''")
-	print (" - Add School: " + Urn)
+	LaName				= LaName.replace("'", "''")
+	EstablishmentName	= EstablishmentName.replace("'", "''")
+	TypeOfEstablishment	= TypeOfEstablishment.replace("'", "''")
+	SchoolWebsite		= SchoolWebsite.replace("'", "''")
+	HeadJobTitle		= HeadJobTitle.replace("'", "''")
+	HeadName			= HeadName.replace("'", "''")	
+	ModifiedDateTime	= str(ModifiedDateTime).replace("'", "''")
+	Domain				= GetDomain(SchoolWebsite) 
+	IsSchUk				= GetIsSchUk(Domain)
+	
+	print (" - Add School: " + Urn + " - " + str(IsSchUk))
 	insertCmd = ("INSERT or REPLACE INTO school (Urn, LaCode, LaName, EstablishmentCode, EstablishmentName, TypeOfEstablishment, SchoolWebsite, Domain, HeadName, HeadJobTitle, ModifiedDateTime) VALUES (" + Urn + ", "+ LaCode + ", '" + LaName +"', " + EstablishmentCode + ", '" + EstablishmentName + "', '" + TypeOfEstablishment + "', '" + SchoolWebsite + "', '" + str(GetDomain(SchoolWebsite)) + "', '" + HeadJobTitle + "', '" + HeadName+ "', '" + ModifiedDateTime + "')")
 	execSql(insertCmd)
 
 # Gets the domain name from the Url
-def GetDomain( url ) :
+def GetDomain ( url ) :
         url = url.replace('https://', '').replace('http://', '').replace('www.', '') + '/'
         url = url[0:url.index('/')]
         return;
 
 # Is the domain name a .sch.uk domain?
-def IsSchUk( domain ) :
-        if (domain[-7:] == '.sch.uk'):
-                return True;
-        else:
-                return False;
+def GetIsSchUk ( domain ) :
+	if (domain == None) :	
+		return False;
+	if ( len(domain) < 8 ) :
+		return False;
+	if ( domain[-7:] == '.sch.uk' ) :
+		return True;
+	else :
+		return False;
 
 # Use the Mythic-Beasts IPv6 health check to get IPv6 score (out of 10)
 def GetIPv6Result ( domain ) :
@@ -114,8 +120,12 @@ def PrintLine ( ) :
 
 # Post a Tweet to Twitter.
 def Tweet ( tweetMessage ) :
-	auth = tweepy.OAuthHandler(GetFileConfig('Twitter', consumer_key), GetFileConfig('Twitter', consumer_secret))
-	auth.set_access_token(GetFileConfig('Twitter', access_token), GetFileConfig('Twitter', access_token_secret))
+	consumer_key		= GetFileConfig('Twitter', 'consumer_key')
+	consumer_secret		= GetFileConfig('Twitter', 'consumer_secret')
+	access_token		= GetFileConfig('Twitter', 'access_token')
+	access_token_secret	= GetFileConfig('Twitter', 'access_token_secret')
+	auth = tweepy.OAuthHandler(consumer_key, consumer_secret)
+	auth.set_access_token(access_token, access_token_secret)
 	api = tweepy.API(auth)
 	api.update_status(status=tweetMessage)
 
@@ -148,22 +158,22 @@ def ImportEdubaseDump ( eduBaseFileName ) :
 # Configuration
 ################
 # Read config from database
-def GetConfig(ConfigItem) : 
+def GetConfig ( ConfigItem ) : 
 	configSql = ("SELECT Value FROM config where Name = '" + ConfigItem + "'")
 	configVal = execSql(configSql)
 	return configVal
 # Set config to database
-def SetConfig(ConfigItem, ConfigType) :
+def SetConfig ( ConfigItem, ConfigType ) :
 	configSql = ("INSERT or REPLACE INTO config (Name, Value) VALUES ('" + ConfigItem + "', '" + ConfigValue + "'")
 	execSql(configSql)
 # Read config from file
-def GetFileConfig (ConfigSection, ConfigItem) :
+def GetFileConfig ( ConfigSection, ConfigItem ) :
 	cfg = ConfigParser.RawConfigParser()
 	cfg.read(configFile)
 	ConfigValue = cfg.get(ConfigSection, ConfigItem)
 	return ConfigValue
 # Set config to database	
-def SetFileConfig (ConfigSection, ConfigItem, ConfigValue) :
+def SetFileConfig ( ConfigSection, ConfigItem, ConfigValue ) :
 	cfg = ConfigParser.RawConfigParser()
 	cfg.add_section(ConfigSection)
 	config.set(ConfigSection, ConfigItem, ConfigValue)
@@ -171,7 +181,7 @@ def SetFileConfig (ConfigSection, ConfigItem, ConfigValue) :
 		cfg.write(configfile)
 
 # Delete database and remove any csv files.
-def ClearDown () :
+def ClearDown ( ) :
 	delOldDumps()
 	if ( os.path.isfile(dbName) ) :
 		os.remove(dbName)	
@@ -181,11 +191,11 @@ def ClearDown () :
 print ("Start  = %s" % now() ) 
 PrintLine()
 
-#CreateDatabase()
-#GetLatestEdubaseDump()
+ClearDown()
+CreateDatabase()
+GetLatestEdubaseDump()
 #noOfSchools = execSql("select count(1) from school")
 #print noOfSchools
-ClearDown()
 
 PrintLine()
 print ("Finish = %s" % now() )
