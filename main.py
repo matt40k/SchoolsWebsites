@@ -11,7 +11,7 @@ import tweepy
 import ConfigParser
 
 # Define variables
-dbName	   = 'school.db'									# Defined the database filename
+dbName	   = 'school.db'					# Defined the database filename
 edubaseUrl = 'https://getedubaseurl.apphb.com/api/Product/'	# Url to the latest Edubase data extract URL
 configFile = 'config.txt'
 
@@ -68,17 +68,26 @@ def CreateDatabase ( ) :
 # Insert record into Schools
 def InsertSchool ( Urn, LaCode, LaName, EstablishmentCode, EstablishmentName, TypeOfEstablishment, SchoolWebsite, HeadJobTitle, HeadName ,ModifiedDateTime ) :
 	LaName				= LaName.replace("'", "''")
-	EstablishmentName	= EstablishmentName.replace("'", "''")
-	TypeOfEstablishment	= TypeOfEstablishment.replace("'", "''")
-	SchoolWebsite		= SchoolWebsite.replace("'", "''")
-	HeadJobTitle		= HeadJobTitle.replace("'", "''")
+	EstablishmentName		= EstablishmentName.replace("'", "''")
+	TypeOfEstablishment		= TypeOfEstablishment.replace("'", "''")
+	SchoolWebsite			= SchoolWebsite.replace("'", "''")
+	HeadJobTitle			= HeadJobTitle.replace("'", "''")
 	HeadName			= HeadName.replace("'", "''")	
-	ModifiedDateTime	= str(ModifiedDateTime).replace("'", "''")
-	Domain				= GetDomain(SchoolWebsite) 
-	IsSchUk				= GetIsSchUk(Domain)
+	if ( not Urn or Urn.isspace() ) :
+		Urn			= null
+	if ( not LaCode or LaCode.isspace() ) :
+		LaCode			= null
+	if ( not EstablishmentCode or EstablishmentCode.isspace() ) :
+		EstablishmentCode	= null
 	
-	print (" - Add School: " + Urn + " - " + str(IsSchUk))
-	insertCmd = ("INSERT or REPLACE INTO school (Urn, LaCode, LaName, EstablishmentCode, EstablishmentName, TypeOfEstablishment, SchoolWebsite, Domain, HeadName, HeadJobTitle, ModifiedDateTime) VALUES (" + Urn + ", "+ LaCode + ", '" + LaName +"', " + EstablishmentCode + ", '" + EstablishmentName + "', '" + TypeOfEstablishment + "', '" + SchoolWebsite + "', '" + str(GetDomain(SchoolWebsite)) + "', '" + HeadJobTitle + "', '" + HeadName+ "', '" + ModifiedDateTime + "')")
+	#ModifiedDateTime		= str(ModifiedDateTime).replace("'", "''")
+	Domain				= GetDomain(SchoolWebsite) 
+	#IsSchUk			= GetIsSchUk(Domain)
+
+	
+	
+	print (" - Add School: " + Urn) # + " - " + str(IsSchUk))
+	insertCmd = ("INSERT or REPLACE INTO school (Urn, LaCode, LaName, EstablishmentCode, EstablishmentName, TypeOfEstablishment, SchoolWebsite, Domain, HeadName, HeadJobTitle) VALUES (" + Urn + ", "+ LaCode + ", '" + LaName +"', " + EstablishmentCode + ", '" + EstablishmentName + "', '" + TypeOfEstablishment + "', '" + SchoolWebsite + "', '" + str(GetDomain(SchoolWebsite)) + "', '" + HeadName + "', '" + HeadJobTitle + "')")
 	execSql(insertCmd)
 
 # Gets the domain name from the Url
