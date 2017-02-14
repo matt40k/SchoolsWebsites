@@ -210,7 +210,7 @@ def ClearDown ( ) :
 
 def ClearStaging ( ) :
 	execSql( "DELETE FROM stagingEdubase;" )
-	execSql( "VACUUM;"
+	execSql( "VACUUM;" )
 	
 ######################
 
