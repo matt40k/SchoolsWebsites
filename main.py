@@ -34,6 +34,15 @@ def execSql ( cmd ) :
 	conn.close()
 	return result
 
+def execSqlInsertIntoStagingEdubase ( Urn, LaCode, LaName, EstablishmentCode, EstablishmentName, TypeOfEstablishment, SchoolWebsite, Domain, HeadName, HeadJobTitle ) :
+	conn = sqlite3.connect(dbName)
+	c = conn.cursor()
+	c.execute("INSERT or REPLACE INTO stagingEdubase (Urn, LaCode, LaName, EstablishmentCode, EstablishmentName, TypeOfEstablishment, SchoolWebsite, Domain, HeadName, HeadJobTitle) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",(Urn, LaCode, LaName, EstablishmentCode, EstablishmentName, TypeOfEstablishment, SchoolWebsite, Domain, HeadName, HeadJobTitle))
+	result = c.fetchone()
+	conn.commit()
+	conn.close()
+	return result
+
 # Delete old Edubase extracts
 def delOldDumps ( ) :
         filelist = [ f for f in os.listdir(".") if f.endswith(".csv") ]
@@ -87,8 +96,9 @@ def InsertSchool ( Urn, LaCode, LaName, EstablishmentCode, EstablishmentName, Ty
 	
 	
 	print (" - Add School: " + Urn) # + " - " + str(IsSchUk))
-	insertCmd = ("INSERT or REPLACE INTO school (Urn, LaCode, LaName, EstablishmentCode, EstablishmentName, TypeOfEstablishment, SchoolWebsite, Domain, HeadName, HeadJobTitle) VALUES (" + Urn + ", "+ LaCode + ", '" + LaName +"', " + EstablishmentCode + ", '" + EstablishmentName + "', '" + TypeOfEstablishment + "', '" + SchoolWebsite + "', '" + str(GetDomain(SchoolWebsite)) + "', '" + HeadName + "', '" + HeadJobTitle + "')")
-	execSql(insertCmd)
+	execSqlInsertIntoStagingEdubase(Urn, LaCode, LaName, EstablishmentCode, EstablishmentName, TypeOfEstablishment, SchoolWebsite, Domain, HeadName, HeadJobTitle)
+	#insertCmd = ("INSERT or REPLACE INTO school (Urn, LaCode, LaName, EstablishmentCode, EstablishmentName, TypeOfEstablishment, SchoolWebsite, Domain, HeadName, HeadJobTitle) VALUES (" + Urn + ", "+ LaCode + ", '" + LaName +"', " + EstablishmentCode + ", '" + EstablishmentName + "', '" + TypeOfEstablishment + "', '" + SchoolWebsite + "', '" + str(GetDomain(SchoolWebsite)) + "', '" + HeadName + "', '" + HeadJobTitle + "')")
+	#execSql(insertCmd)
 
 # Gets the domain name from the Url
 def GetDomain ( url ) :
