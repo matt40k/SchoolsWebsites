@@ -36,6 +36,7 @@ def execSql ( cmd ) :
 
 def execSqlInsertIntoStagingEdubase ( Urn, LaCode, LaName, EstablishmentCode, EstablishmentName, TypeOfEstablishment, SchoolWebsite, Domain, HeadName, HeadJobTitle ) :
 	conn = sqlite3.connect(dbName)
+	conn.text_factory = str
 	c = conn.cursor()
 	c.execute("INSERT or REPLACE INTO stagingEdubase (Urn, LaCode, LaName, EstablishmentCode, EstablishmentName, TypeOfEstablishment, SchoolWebsite, Domain, HeadName, HeadJobTitle) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",(Urn, LaCode, LaName, EstablishmentCode, EstablishmentName, TypeOfEstablishment, SchoolWebsite, Domain, HeadName, HeadJobTitle))
 	result = c.fetchone()
@@ -83,11 +84,11 @@ def InsertSchool ( Urn, LaCode, LaName, EstablishmentCode, EstablishmentName, Ty
 	HeadJobTitle			= HeadJobTitle.replace("'", "''")
 	HeadName			= HeadName.replace("'", "''")	
 	if ( not Urn or Urn.isspace() ) :
-		Urn			= null
+		Urn			= None
 	if ( not LaCode or LaCode.isspace() ) :
-		LaCode			= null
+		LaCode			= None
 	if ( not EstablishmentCode or EstablishmentCode.isspace() ) :
-		EstablishmentCode	= null
+		EstablishmentCode	= None
 	
 	#ModifiedDateTime		= str(ModifiedDateTime).replace("'", "''")
 	Domain				= GetDomain(SchoolWebsite) 
