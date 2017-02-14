@@ -198,13 +198,20 @@ def SetFileConfig ( ConfigSection, ConfigItem, ConfigValue ) :
 	config.set(ConfigSection, ConfigItem, ConfigValue)
 	with open(configFile, 'wb') as configfile :
 		cfg.write(configfile)
-
+		
+################
+# Cleaning		
+################		
 # Delete database and remove any csv files.
 def ClearDown ( ) :
 	delOldDumps()
 	if ( os.path.isfile(dbName) ) :
 		os.remove(dbName)	
 
+def ClearStaging ( ) :
+	execSql( "DELETE FROM stagingEdubase;" )
+	execSql( "VACUUM;"
+	
 ######################
 
 print ("Start  = %s" % now() ) 
