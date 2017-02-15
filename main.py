@@ -56,7 +56,7 @@ def GetLatestEdubaseDump ( ) :
 	response = urlopen(edubaseUrl)
 	dumpUrl = json.loads(response.read())[0]["AllDownloadUrl"]
 	dumpName = urlparse.urlsplit(dumpUrl).path.split('/')[-1]
-	if (not os.path.isfile(dumpName)):
+	if ( not os.path.isfile(dumpName) ):
 	        delOldDumps()
 	        print ("Downloading Edubase data...")
 	        f = urlopen(dumpUrl)
@@ -67,7 +67,7 @@ def GetLatestEdubaseDump ( ) :
 
 # Create database
 def CreateDatabase ( ) :
-	if (not os.path.exists(dbName)) :
+	if ( os.path.exists(dbName) ) :
 		print ("Creating database...")
 		sqlFiles = os.listdir("sql")
 		for sqlFile in sqlFiles :
@@ -96,7 +96,7 @@ def InsertSchool ( Urn, LaCode, LaName, EstablishmentCode, EstablishmentName, Ty
 
 	
 	
-	print (" - Add School: " + Urn) # + " - " + str(IsSchUk))
+	print ( " - Add School: " + Urn ) # + " - " + str(IsSchUk))
 	execSqlInsertIntoStagingEdubase(Urn, LaCode, LaName, EstablishmentCode, EstablishmentName, TypeOfEstablishment, SchoolWebsite, Domain, HeadName, HeadJobTitle)
 	#insertCmd = ("INSERT or REPLACE INTO school (Urn, LaCode, LaName, EstablishmentCode, EstablishmentName, TypeOfEstablishment, SchoolWebsite, Domain, HeadName, HeadJobTitle) VALUES (" + Urn + ", "+ LaCode + ", '" + LaName +"', " + EstablishmentCode + ", '" + EstablishmentName + "', '" + TypeOfEstablishment + "', '" + SchoolWebsite + "', '" + str(GetDomain(SchoolWebsite)) + "', '" + HeadName + "', '" + HeadJobTitle + "')")
 	#execSql(insertCmd)
@@ -109,7 +109,7 @@ def GetDomain ( url ) :
 
 # Is the domain name a .sch.uk domain?
 def GetIsSchUk ( domain ) :
-	if (domain == None) :	
+	if ( domain == None) :	
 		return False;
 	if ( len(domain) < 8 ) :
 		return False;
@@ -215,14 +215,14 @@ def ClearStaging ( ) :
 	
 ######################
 
-print ("Start  = %s" % now() ) 
+print ( "Start  = %s" % now() ) 
 PrintLine()
 
-ClearDown()
+#ClearDown()
 CreateDatabase()
 GetLatestEdubaseDump()
-#noOfSchools = execSql("select count(1) from school")
-#print noOfSchools
+noOfSchools = execSql("select count(1) from school_detail;")
+print noOfSchools
 
 PrintLine()
-print ("Finish = %s" % now() )
+print ( "Finish = %s" % now() )
