@@ -67,7 +67,7 @@ def GetLatestEdubaseDump ( ) :
 
 # Create database
 def CreateDatabase ( ) :
-	if ( os.path.exists(dbName) ) :
+	if ( not os.path.exists(dbName) ) :
 		print ("Creating database...")
 		sqlFiles = os.listdir("sql")
 		for sqlFile in sqlFiles :
