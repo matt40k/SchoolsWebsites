@@ -19,7 +19,7 @@ configFile = 'config.txt'
 def now () :
 	return datetime.datetime.now()
 
-# Read SQL files
+# Read file
 def readFile ( fileName ) :
 	with open(fileName, 'rb') as fileContent :
 		return fileContent.read()
@@ -34,6 +34,7 @@ def execSql ( cmd ) :
 	conn.close()
 	return result
 
+# Execute SQL script to insert into stagingEdubase
 def execSqlInsertIntoStagingEdubase ( Urn, LaCode, LaName, EstablishmentCode, EstablishmentName, TypeOfEstablishment, SchoolWebsite, Domain, HeadName, HeadJobTitle ) :
 	conn = sqlite3.connect(dbName)
 	conn.text_factory = str
@@ -63,6 +64,7 @@ def GetLatestEdubaseDump ( ) :
 		dumpName = os.path.basename(dumpUrl)
 		with open(dumpName, "wb") as local_file:
 	            local_file.write(f.read())
+		ClearStaging()
 		ImportEdubaseDump(dumpName)		
 
 # Create database
@@ -71,9 +73,10 @@ def CreateDatabase ( ) :
 		print ("Creating database...")
 		sqlFiles = os.listdir("sql")
 		for sqlFile in sqlFiles :
-			print (" - Running SQL Script - " + sqlFile)
-			cmdCreateTable = readFile("sql/" + sqlFile)
-			execSql(cmdCreateTable)
+			if (not sqlFile.startswith("merge_")) :
+				print (" - Running SQL Script - " + sqlFile)
+				cmdCreateTable = readFile("sql/" + sqlFile)
+				execSql(cmdCreateTable)
 
 # Insert record into Schools
 def InsertSchool ( Urn, LaCode, LaName, EstablishmentCode, EstablishmentName, TypeOfEstablishment, SchoolWebsite, HeadJobTitle, HeadName ,ModifiedDateTime ) :
@@ -98,8 +101,6 @@ def InsertSchool ( Urn, LaCode, LaName, EstablishmentCode, EstablishmentName, Ty
 	
 	print ( " - Add School: " + Urn ) # + " - " + str(IsSchUk))
 	execSqlInsertIntoStagingEdubase(Urn, LaCode, LaName, EstablishmentCode, EstablishmentName, TypeOfEstablishment, SchoolWebsite, Domain, HeadName, HeadJobTitle)
-	#insertCmd = ("INSERT or REPLACE INTO school (Urn, LaCode, LaName, EstablishmentCode, EstablishmentName, TypeOfEstablishment, SchoolWebsite, Domain, HeadName, HeadJobTitle) VALUES (" + Urn + ", "+ LaCode + ", '" + LaName +"', " + EstablishmentCode + ", '" + EstablishmentName + "', '" + TypeOfEstablishment + "', '" + SchoolWebsite + "', '" + str(GetDomain(SchoolWebsite)) + "', '" + HeadName + "', '" + HeadJobTitle + "')")
-	#execSql(insertCmd)
 
 # Gets the domain name from the Url
 def GetDomain ( url ) :
@@ -209,6 +210,7 @@ def ClearDown ( ) :
 	if ( os.path.isfile(dbName) ) :
 		os.remove(dbName)	
 
+# Clear down the Staging table - stagingEdubase
 def ClearStaging ( ) :
 	execSql( "DELETE FROM stagingEdubase;" )
 	execSql( "VACUUM;" )
@@ -221,6 +223,8 @@ PrintLine()
 #ClearDown()
 CreateDatabase()
 GetLatestEdubaseDump()
+sqlOut = readFile("sql/merge_stagingEdubase_to_school.sql")
+output1 = execSql(sqlOut)
 noOfSchools = execSql("select count(1) from school_detail;")
 print noOfSchools
 

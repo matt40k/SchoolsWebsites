@@ -10,5 +10,11 @@ CREATE TABLE IF NOT EXISTS school
 	,Domain 		text		NOT NULL
 	,HeadName 		text		NOT NULL
 	,HeadJobTitle 		text		NOT NULL
+	,Ipv6Score		int		NULL
+	,UKdomain		int		NULL
+	,CMS			text		NULL
+	,HTMLtype		text		NULL
+	,HomepageSize		int		NULL
+	,GoogleAnalytics	int		NULL
 	,ModifiedDateTime 	timestamp	NOT NULL	DEFAULT CURRENT_TIMESTAMP
 );

@@ -1,0 +1,25 @@
+INSERT OR IGNORE INTO school (
+	Urn
+	,LaCode
+	,LaName
+	,EstablishmentCode
+	,EstablishmentName
+	,TypeOfEstablishment
+	,SchoolWebsite
+	,Domain
+	,HeadName
+	,HeadJobTitle
+)
+SELECT
+	Urn
+	,LaCode
+	,LaName
+	,EstablishmentCode
+	,EstablishmentName
+	,TypeOfEstablishment
+	,SchoolWebsite
+	,Domain
+	,HeadName
+	,HeadJobTitle
+FROM
+	stagingEdubase
