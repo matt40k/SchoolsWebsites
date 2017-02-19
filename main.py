@@ -4,11 +4,12 @@ import os
 import urlparse
 import csv
 import sys
-from urllib2 import urlopen
 import json
 import datetime
 import tweepy
 import ConfigParser
+from urllib2 import urlopen
+from jinja2 import Template
 
 # Define variables
 dbName	   = 'school.db'					# Defined the database filename
@@ -34,6 +35,16 @@ def execSql ( cmd ) :
 	conn.close()
 	return result
 
+def execSqlReturnArray ( cmd ) :
+        conn = sqlite3.connect(dbName)
+        conn.text_factory = str
+	c = conn.cursor()
+        c.execute( cmd )
+        result = c.fetchall()
+        conn.commit()
+        conn.close()
+        return result
+
 # Execute SQL script to insert into stagingEdubase
 def execSqlInsertIntoStagingEdubase ( Urn, LaCode, LaName, EstablishmentCode, EstablishmentName, TypeOfEstablishment, SchoolWebsite, Domain, HeadName, HeadJobTitle ) :
 	conn = sqlite3.connect(dbName)
@@ -44,6 +55,23 @@ def execSqlInsertIntoStagingEdubase ( Urn, LaCode, LaName, EstablishmentCode, Es
 	conn.commit()
 	conn.close()
 	return result
+
+# Execute SQL script to get the school objects then run the create school function
+def execSqlSelectSchool ( ) :
+        cmd = "Select Urn, LaCode, LaName, EstablishmentCode, EstablishmentName, TypeOfEstablishment, SchoolWebsite, Domain, HeadName, HeadJobTitle, Ipv6Score, UKdomain, CMS, HTMLtype, HomepageSize, GoogleAnalytics, ModifiedDateTime from school"
+	conn = sqlite3.connect(dbName)
+        conn.text_factory = str
+	c = conn.cursor()
+        c.execute( cmd )
+        result = c.fetchall()
+	for row in result :
+        	#Urn, EstablishmentName = row
+		Urn, LaCode, LaName, EstablishmentCode, EstablishmentName, TypeOfEstablishment, SchoolWebsite, Domain, HeadName, HeadJobTitle, Ipv6Score, UKdomain, CMS, HTMLtype, HomepageSize, GoogleAnalytics, ModifiedDateTime = row
+		print Urn
+		CreateSchoolHtml ( Urn, LaCode, LaName, EstablishmentCode, EstablishmentName, TypeOfEstablishment, SchoolWebsite, Domain, HeadName, HeadJobTitle, Ipv6Score, UKdomain, CMS, HTMLtype, HomepageSize, GoogleAnalytics, ModifiedDateTime )
+	conn.commit()
+        conn.close()
+	return "Done" 
 
 # Delete old Edubase extracts
 def delOldDumps ( ) :
@@ -66,6 +94,7 @@ def GetLatestEdubaseDump ( ) :
 	            local_file.write(f.read())
 		ClearStaging()
 		ImportEdubaseDump(dumpName)		
+				
 
 # Create database
 def CreateDatabase ( ) :
@@ -175,6 +204,34 @@ def ImportEdubaseDump ( eduBaseFileName ) :
 				InsertSchool(Urn, LaCode, LaName, EstablishmentCode, EstablishmentName, TypeOfEstablishment, SchoolWebsite, HeadJobTitle, HeadName, now() )
 
                		rowNo += 1
+
+def MergeSchool ( ) :
+	sqlFiles = os.listdir("sql")
+	for sqlFile in sqlFiles :
+		if (sqlFile.startswith("merge_")) :
+			print (" - Running SQL Script - " + sqlFile)
+			cmdCreateTable = readFile("sql/" + sqlFile)
+			print cmdCreateTable
+			print execSql(cmdCreateTable)
+
+################
+# HTML creation
+################
+
+# Write School HTML file
+def CreateSchoolHtml ( Urn, LaCode, LaName, EstablishmentCode, EstablishmentName, TypeOfEstablishment, SchoolWebsite, Domain, HeadName, HeadJobTitle, Ipv6Score, UKdomain, CMS, HTMLtype, HomepageSize, GoogleAnalytics, ModifiedDateTime ) :
+	#tc = readFile('template/school.html')
+	t = Template(readFile('template/school.html'))
+ 	htmlContent = t.render(schoolName=EstablishmentName)
+	#print htmlContent
+	htmlFile = open('html/school/' + Urn + '.html', 'wb')
+	htmlFile.write(htmlContent)
+	htmlFile.close()
+
+def CreateHtml ( ) :
+	result = execSqlSelectSchool()	
+	#print result
+
 ################
 # Configuration
 ################
@@ -221,12 +278,14 @@ print ( "Start  = %s" % now() )
 PrintLine()
 
 #ClearDown()
-CreateDatabase()
-GetLatestEdubaseDump()
-sqlOut = readFile("sql/merge_stagingEdubase_to_school.sql")
-output1 = execSql(sqlOut)
-noOfSchools = execSql("select count(1) from school_detail;")
-print noOfSchools
-
+#CreateDatabase()
+#GetLatestEdubaseDump()
+#sqlOut = readFile("sql/merge_stagingEdubase_to_school.sql")
+#output1 = execSql(sqlOut)
+#noOfSchools = execSql("select count(1) from school_detail;")
+#print noOfSchools
+CreateHtml()
+r = execSql("select * from school")
+print r
 PrintLine()
 print ( "Finish = %s" % now() )

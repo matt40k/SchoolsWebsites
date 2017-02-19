@@ -9,6 +9,12 @@ INSERT OR IGNORE INTO school (
 	,Domain
 	,HeadName
 	,HeadJobTitle
+	,Ipv6Score
+        ,UKdomain
+        ,CMS
+        ,HTMLtype
+        ,HomepageSize
+        ,GoogleAnalytics
 )
 SELECT
 	Urn
@@ -21,5 +27,11 @@ SELECT
 	,Domain
 	,HeadName
 	,HeadJobTitle
+	,-10
+	,-10
+	,''
+	,''
+	,-10
+	,-10
 FROM
 	stagingEdubase
