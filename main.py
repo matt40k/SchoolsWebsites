@@ -67,7 +67,7 @@ def execSqlSelectSchool ( ) :
 	for row in result :
         	#Urn, EstablishmentName = row
 		Urn, LaCode, LaName, EstablishmentCode, EstablishmentName, TypeOfEstablishment, SchoolWebsite, Domain, HeadName, HeadJobTitle, Ipv6Score, UKdomain, CMS, HTMLtype, HomepageSize, GoogleAnalytics, ModifiedDateTime = row
-		print Urn
+		#print Urn
 		CreateSchoolHtml ( Urn, LaCode, LaName, EstablishmentCode, EstablishmentName, TypeOfEstablishment, SchoolWebsite, Domain, HeadName, HeadJobTitle, Ipv6Score, UKdomain, CMS, HTMLtype, HomepageSize, GoogleAnalytics, ModifiedDateTime )
 	conn.commit()
         conn.close()
@@ -217,11 +217,13 @@ def MergeSchool ( ) :
 
 # Write School HTML file
 def CreateSchoolHtml ( Urn, LaCode, LaName, EstablishmentCode, EstablishmentName, TypeOfEstablishment, SchoolWebsite, Domain, HeadName, HeadJobTitle, Ipv6Score, UKdomain, CMS, HTMLtype, HomepageSize, GoogleAnalytics, ModifiedDateTime ) :
+	schDir = 'html/school/' + str(Urn)
+	os.mkdir(schDir)
 	#tc = readFile('template/school.html')
 	t = Template(readFile('template/school.html'))
  	htmlContent = t.render(schoolName=EstablishmentName)
 	#print htmlContent
-	htmlFile = open('html/school/' + Urn + '.html', 'wb')
+	htmlFile = open(schDir + '/index.html', 'wb')
 	htmlFile.write(htmlContent)
 	htmlFile.close()
 
@@ -277,12 +279,9 @@ PrintLine()
 #ClearDown()
 CreateDatabase()
 GetLatestEdubaseDump()
-r = execSqlReturnArray("select * from audit")
-print r
-
-#CreateHtml()
-
-
+#r = execSqlReturnArray("select * from audit")
+#print r
+CreateHtml()
 
 PrintLine()
 print ( "Finish = %s" % now() )
