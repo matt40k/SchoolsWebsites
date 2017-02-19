@@ -1,4 +1,4 @@
-# $Id$
+-- $Id$
 CREATE TABLE IF NOT EXISTS version
 (
         FileName                text            NOT NULL        PRIMARY KEY ASC

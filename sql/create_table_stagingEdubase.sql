@@ -1,14 +1,14 @@
 CREATE TABLE IF NOT EXISTS stagingEdubase
 (
 	Urn			int		NOT NULL	PRIMARY KEY ASC
-	,LaCode			int		NOT NULL
-	,LaName			text		NOT NULL
-	,EstablishmentCode	int		NOT NULL
-	,EstablishmentName	text		NOT NULL
-	,TypeOfEstablishment	text		NOT NULL
-	,SchoolWebsite		text		NOT NULL
-	,Domain			text		NOT NULL
-	,HeadName		text		NOT NULL
-	,HeadJobTitle		text		NOT NULL
+	,LaCode			int		NULL
+	,LaName			text		NULL
+	,EstablishmentCode	int		NULL
+	,EstablishmentName	text		NULL
+	,TypeOfEstablishment	text		NULL
+	,SchoolWebsite		text		NULL
+	,Domain			text		NULL
+	,HeadName		text		NULL
+	,HeadJobTitle		text		NULL
 	,ModifiedDateTime	timestamp	NOT NULL	DEFAULT CURRENT_TIMESTAMP
 );

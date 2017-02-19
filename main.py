@@ -94,7 +94,7 @@ def GetLatestEdubaseDump ( ) :
 	            local_file.write(f.read())
 		ClearStaging()
 		ImportEdubaseDump(dumpName)		
-				
+		MergeSchool()		
 
 # Create database
 def CreateDatabase ( ) :
@@ -121,21 +121,19 @@ def InsertSchool ( Urn, LaCode, LaName, EstablishmentCode, EstablishmentName, Ty
 		LaCode			= None
 	if ( not EstablishmentCode or EstablishmentCode.isspace() ) :
 		EstablishmentCode	= None
+	if ( SchoolWebsite and not SchoolWebsite.isspace() ) :
+		schDomain			= GetDomain(SchoolWebsite) 
+	schDomain = None
 	
-	#ModifiedDateTime		= str(ModifiedDateTime).replace("'", "''")
-	Domain				= GetDomain(SchoolWebsite) 
 	#IsSchUk			= GetIsSchUk(Domain)
-
-	
-	
 	print ( " - Add School: " + Urn ) # + " - " + str(IsSchUk))
-	execSqlInsertIntoStagingEdubase(Urn, LaCode, LaName, EstablishmentCode, EstablishmentName, TypeOfEstablishment, SchoolWebsite, Domain, HeadName, HeadJobTitle)
+	execSqlInsertIntoStagingEdubase(Urn, LaCode, LaName, EstablishmentCode, EstablishmentName, TypeOfEstablishment, SchoolWebsite, schDomain, HeadName, HeadJobTitle)
 
 # Gets the domain name from the Url
 def GetDomain ( url ) :
-        url = url.replace('https://', '').replace('http://', '').replace('www.', '') + '/'
-        url = url[0:url.index('/')]
-        return;
+        resultUrl = url.replace('https://', '').replace('http://', '').replace('www.', '') + '/'
+        resultUrl = resultUrl[0:resultUrl.index('/')]
+        return resultUrl;
 
 # Is the domain name a .sch.uk domain?
 def GetIsSchUk ( domain ) :
@@ -209,10 +207,9 @@ def MergeSchool ( ) :
 	sqlFiles = os.listdir("sql")
 	for sqlFile in sqlFiles :
 		if (sqlFile.startswith("merge_")) :
-			print (" - Running SQL Script - " + sqlFile)
+			print (" - Running merge SQL Script - " + sqlFile)
 			cmdCreateTable = readFile("sql/" + sqlFile)
-			print cmdCreateTable
-			print execSql(cmdCreateTable)
+			execSql(cmdCreateTable)
 
 ################
 # HTML creation
@@ -278,14 +275,14 @@ print ( "Start  = %s" % now() )
 PrintLine()
 
 #ClearDown()
-#CreateDatabase()
-#GetLatestEdubaseDump()
-#sqlOut = readFile("sql/merge_stagingEdubase_to_school.sql")
-#output1 = execSql(sqlOut)
-#noOfSchools = execSql("select count(1) from school_detail;")
-#print noOfSchools
-CreateHtml()
-r = execSql("select * from school")
+CreateDatabase()
+GetLatestEdubaseDump()
+r = execSqlReturnArray("select * from audit")
 print r
+
+#CreateHtml()
+
+
+
 PrintLine()
 print ( "Finish = %s" % now() )

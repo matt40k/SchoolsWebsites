@@ -1,4 +1,4 @@
-INSERT OR IGNORE INTO school (
+INSERT INTO school (
 	Urn
 	,LaCode
 	,LaName
@@ -35,3 +35,5 @@ SELECT
 	,-10
 FROM
 	stagingEdubase
+WHERE
+	Urn not in (select Urn from school)
