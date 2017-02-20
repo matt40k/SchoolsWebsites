@@ -221,7 +221,8 @@ def CreateSchoolHtml ( Urn, LaCode, LaName, EstablishmentCode, EstablishmentName
 	os.mkdir(schDir)
 	#tc = readFile('template/school.html')
 	t = Template(readFile('template/school.html'))
- 	htmlContent = t.render(schoolName=EstablishmentName)
+ 	htmlContent = t.render(Urn=Urn, LaCode=LaCode, LaName=LaName, EstablishmentCode=EstablishmentCode, EstablishmentName=EstablishmentName, TypeOfEstablishment=TypeOfEstablishment, SchoolWebsite=SchoolWebsite, Domain=Domain, HeadName=HeadName, HeadJobTitle=HeadJobTitle, Ipv6Score=Ipv6Score, UKDomain=UKdomain, CMS=CMS, HTMLtype=HTMLtype, HomepageSize=HomepageSize, GoogleAnalytics=GoogleAnalytics, ModifiedDateTime=ModifiedDateTime)
+	#schoolName=EstablishmentName)
 	#print htmlContent
 	htmlFile = open(schDir + '/index.html', 'wb')
 	htmlFile.write(htmlContent)
@@ -279,8 +280,6 @@ PrintLine()
 #ClearDown()
 CreateDatabase()
 GetLatestEdubaseDump()
-#r = execSqlReturnArray("select * from audit")
-#print r
 CreateHtml()
 
 PrintLine()
