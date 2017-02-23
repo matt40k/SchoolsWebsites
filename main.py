@@ -218,13 +218,14 @@ def MergeSchool ( ) :
 # Write School HTML file
 def CreateSchoolHtml ( Urn, LaCode, LaName, EstablishmentCode, EstablishmentName, TypeOfEstablishment, SchoolWebsite, Domain, HeadName, HeadJobTitle, Ipv6Score, UKdomain, CMS, HTMLtype, HomepageSize, GoogleAnalytics, ModifiedDateTime ) :
 	schDir = 'html/school/' + str(Urn)
-	os.mkdir(schDir)
+	if ( not os.path.exists(schDir) ) :
+		os.mkdir(schDir)
 	#tc = readFile('template/school.html')
 	t = Template(readFile('template/school.html'))
  	htmlContent = t.render(Urn=Urn, LaCode=LaCode, LaName=LaName, EstablishmentCode=EstablishmentCode, EstablishmentName=EstablishmentName, TypeOfEstablishment=TypeOfEstablishment, SchoolWebsite=SchoolWebsite, Domain=Domain, HeadName=HeadName, HeadJobTitle=HeadJobTitle, Ipv6Score=Ipv6Score, UKDomain=UKdomain, CMS=CMS, HTMLtype=HTMLtype, HomepageSize=HomepageSize, GoogleAnalytics=GoogleAnalytics, ModifiedDateTime=ModifiedDateTime)
 	#schoolName=EstablishmentName)
 	#print htmlContent
-	htmlFile = open(schDir + '/index.html', 'wb')
+	htmlFile = open(schDir + '/index.html', 'w+b')
 	htmlFile.write(htmlContent)
 	htmlFile.close()
 
