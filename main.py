@@ -217,6 +217,7 @@ def MergeSchool ( ) :
 
 # Write School HTML file
 def CreateSchoolHtml ( Urn, LaCode, LaName, EstablishmentCode, EstablishmentName, TypeOfEstablishment, SchoolWebsite, Domain, HeadName, HeadJobTitle, Ipv6Score, UKdomain, CMS, HTMLtype, HomepageSize, GoogleAnalytics, ModifiedDateTime ) :
+	print ( "Building HTML for - " + str(Urn) )
 	schDir = 'html/school/' + str(Urn)
 	if ( not os.path.exists(schDir) ) :
 		os.mkdir(schDir)
